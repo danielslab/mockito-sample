@@ -19,9 +19,9 @@ public class MockitoTest {
 	@Test
 	public void test001() {
 		List mockedList = mock(List.class);
-		
+
 		when(mockedList.get(0)).thenReturn("aaa");
-		
+
 		assertThat((String)mockedList.get(0), is("aaa"));
 		assertNull(mockedList.get(1));
 	}
@@ -32,9 +32,9 @@ public class MockitoTest {
 	@Test
 	public void test002() {
 		List mockedList = mock(List.class);
-		
+
 		when(mockedList.get(0)).thenThrow(new RuntimeException("aaa"));
-		
+
 		try {
 			mockedList.get(0);
 			fail();
@@ -49,9 +49,9 @@ public class MockitoTest {
 	@Test
 	public void test003() {
 		List mockedList = mock(List.class);
-		
+
 		doThrow(new RuntimeException("aaa")).when(mockedList).clear();
-		
+
 		try {
 			mockedList.clear();
 			fail();
@@ -66,12 +66,12 @@ public class MockitoTest {
 	@Test
 	public void test004() {
 		List spiedList = spy(new ArrayList());
-		
+
 		// リアルオブジェクトには"bbb"を追加したが
 		spiedList.add("bbb");
 		// スパイでget(0)は"aaa"を返すようにした
 		when(spiedList.get(0)).thenReturn("aaa");
-		
+
 		// 結果は"aaa"が得られる
 		assertThat((String)spiedList.get(0), is("aaa"));
 		// その他のメソッドはリアルの結果が返される
@@ -84,12 +84,12 @@ public class MockitoTest {
 	@Test
 	public void test005() {
 		List spiedList = spy(new ArrayList());
-		
+
 		// リアルオブジェクトには"bbb"を追加したが
 		spiedList.add("bbb");
 		// スパイでget(0)はRuntimeExceptionをスローするようにした
 		when(spiedList.get(0)).thenThrow(new RuntimeException("aaa"));
-		
+
 		try {
 			spiedList.get(0);
 			fail();
@@ -106,19 +106,19 @@ public class MockitoTest {
 	@Test
 	public void test006() {
 		List spiedList = spy(new ArrayList());
-		
+
 		// リアルオブジェクトには"bbb"を追加
 		spiedList.add("bbb");
 		// clearが呼ばれたときはRuntimeExceptionを投げる
 		doThrow(new RuntimeException("aaa")).when(spiedList).clear();
-		
+
 		try {
 			spiedList.clear();
 			fail();
 		} catch(RuntimeException e) {
 			assertThat(e.getMessage(), is("aaa"));
 		}
-		
+
 		assertThat(spiedList.size(), is(1));
 		assertThat((String)spiedList.get(0), is("bbb"));
 	}
