@@ -2,6 +2,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -9,6 +10,8 @@ import static org.powermock.api.mockito.PowerMockito.doThrow;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -20,7 +23,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 // new Objectをモックするテスト
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({DateUtil.class, System.class})
+@PrepareForTest({ DateUtil.class })
 public class DateUtilTest {
 	@Test
 	public void test007() throws Exception {
@@ -52,11 +55,10 @@ public class DateUtilTest {
 		try {
 			String strDate = DateUtil.getCurrentDate();
 			fail();
-		} catch(RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertThat(e.getMessage(), is("aaa"));
 		}
 	}
-
 
 	@Test
 	public void test009() throws Exception {
@@ -69,7 +71,7 @@ public class DateUtilTest {
 		try {
 			DateUtil.setCurrentDate(123456789L);
 			fail();
-		} catch(RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertThat(e.getMessage(), is("bbb"));
 		}
 	}
@@ -77,7 +79,7 @@ public class DateUtilTest {
 	@Test
 	public void test010() {
 		PowerMockito.mockStatic(String.class);
-		when(String.valueOf(anyBoolean())).thenReturn("false");
+		PowerMockito.when(String.valueOf(anyBoolean())).thenReturn("false");
 
 		assertThat(String.valueOf(true), is("false"));
 		assertThat(String.valueOf(false), is("false"));
@@ -86,32 +88,139 @@ public class DateUtilTest {
 	@Test
 	public void test011() {
 		PowerMockito.mockStatic(String.class);
-		when(String.valueOf(true)).thenThrow(new RuntimeException("aaa"));
+		PowerMockito.when(String.valueOf(true)).thenThrow(new RuntimeException("aaa"));
 
 		try {
 			assertThat(String.valueOf(true), is("false"));
 			fail();
-		} catch(RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertThat(e.getMessage(), is("aaa"));
 		}
 		assertNull(String.valueOf(false));
 	}
-
 
 	@Test
 	public void test012() {
 		PowerMockito.mockStatic(DateUtil.class);
 		try {
 			doThrow(new RuntimeException("bbb")).when(DateUtil.class, "setCurrentDate", anyLong());
-		} catch(Exception e) {
+		} catch (Exception e) {
 			fail();
 		}
 
 		try {
 			DateUtil.setCurrentDate(12345L);
 			fail();
-		} catch(RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertThat(e.getMessage(), is("bbb"));
+		}
+	}
+
+	@Test
+	public void test013() throws Exception {
+		// 記録フェーズ
+		DateUtil dateMocked = PowerMockito.mock(DateUtil.class);
+		PowerMockito.when(dateMocked, "getYYYYMMDDString", (Date) any()).thenReturn("12345678");
+
+		// リプレイフェーズ
+		Method getYYYYMMDDStringMethod = DateUtil.class.getDeclaredMethod("getYYYYMMDDString", Date.class);
+		getYYYYMMDDStringMethod.setAccessible(true);
+		String actual = (String)getYYYYMMDDStringMethod.invoke(dateMocked, new Date());
+
+		// 検証フェーズ
+		assertThat(actual, is("12345678"));
+	}
+
+	@Test
+	public void test014() throws Exception {
+		// 記録フェーズ
+		DateUtil dateMocked = PowerMockito.mock(DateUtil.class);
+		PowerMockito.when(dateMocked, "getYYYYMMDDString", (Date) any()).thenThrow(new Exception("aaa"));
+
+		// リプレイフェーズ
+		try {
+			Method getYYYYMMDDStringMethod = DateUtil.class.getDeclaredMethod("getYYYYMMDDString", Date.class);
+			getYYYYMMDDStringMethod.setAccessible(true);
+			getYYYYMMDDStringMethod.invoke(dateMocked, new Date());
+			fail();
+		} catch (Exception e) {
+			if (e instanceof InvocationTargetException) {
+				InvocationTargetException ite = (InvocationTargetException) e;
+				assertThat(ite.getTargetException().getMessage(), is("aaa"));
+			} else {
+				fail();
+			}
+		}
+	}
+
+	@Test
+	public void test015() throws Exception {
+		// 記録フェーズ
+		DateUtil dateMocked = PowerMockito.mock(DateUtil.class);
+		PowerMockito.doThrow(new Exception("bbb")).when(dateMocked, "setFlag", anyBoolean());
+
+		// リプレイフェーズ
+		Method setFlagMethod = DateUtil.class.getDeclaredMethod("setFlag", Boolean.class);
+		setFlagMethod.setAccessible(true);
+		try {
+			setFlagMethod.invoke(dateMocked, true);
+			fail();
+		} catch (Exception e) {
+			if (e instanceof InvocationTargetException) {
+				InvocationTargetException ite = (InvocationTargetException) e;
+				assertThat(ite.getTargetException().getMessage(), is("bbb"));
+			} else {
+				fail();
+			}
+		}
+	}
+
+	@Test
+	public void test016() throws Exception {
+		// 記録フェーズ
+		DateUtil dateMocked = PowerMockito.spy(new DateUtil());
+		PowerMockito.doReturn("12345678").when(dateMocked, "getYYYYMMDDString", (Date) any());
+
+		// リプレイフェーズ
+		String strDate = dateMocked.getYYYYMMDDStringWrapper(new Date());
+
+		// 検証フェーズ
+		assertThat(strDate, is("12345678"));
+	}
+
+	@Test
+	public void test017() throws Exception {
+		// 記録フェーズ
+		DateUtil dateMocked = PowerMockito.spy(new DateUtil());
+		PowerMockito.doThrow(new RuntimeException("aaa")).when(dateMocked, "getYYYYMMDDString", (Date) any());
+
+		// リプレイフェーズ
+		try {
+			String strDate = dateMocked.getYYYYMMDDStringWrapper(new Date());
+		} catch (RuntimeException e) {
+			assertThat(e.getMessage(), is("aaa"));
+		}
+	}
+
+	@Test
+	public void test018() throws Exception {
+		// 記録フェーズ
+		DateUtil dateMocked = PowerMockito.spy(new DateUtil());
+		PowerMockito.doThrow(new Exception("bbb")).when(dateMocked, "setFlag", anyBoolean());
+
+		// リプレイフェーズ
+		Method setFlagMethod = DateUtil.class.getDeclaredMethod("setFlag", Boolean.class);
+		setFlagMethod.setAccessible(true);
+		try {
+			setFlagMethod.invoke(dateMocked, true);
+			fail();
+		} catch (Exception e) {
+			if (e instanceof InvocationTargetException) {
+				InvocationTargetException ite = (InvocationTargetException) e;
+				assertThat(ite.getTargetException().getMessage(), is("bbb"));
+			} else {
+				fail();
+			}
 		}
 	}
 }
