@@ -14,7 +14,7 @@ import org.junit.Test;
 
 public class MockitoTest {
 	/**
-	 * ƒƒ\ƒbƒh	ŠO•”‚©‚ç’“ü‰Â”\	public	voidˆÈŠO	‘S•”	’l‚ğ–ß‚·
+	 * publicãƒ¡ã‚½ãƒƒãƒ‰ã€æˆ»ã‚Šå‹ã¯voidä»¥å¤–ã€å…¨éƒ¨ãƒ¢ãƒƒã‚¯ã€å€¤ã‚’æˆ»ã™
 	 */
 	@Test
 	public void test001() {
@@ -27,7 +27,7 @@ public class MockitoTest {
 	}
 
 	/**
-	 * ƒƒ\ƒbƒh	ŠO•”‚©‚ç’“ü‰Â”\	public	voidˆÈŠO	‘S•”	—áŠO‚ğ“Š‚°‚é
+	 * publicãƒ¡ã‚½ãƒƒãƒ‰ã€æˆ»ã‚Šå‹ã¯voidä»¥å¤–ã€å…¨éƒ¨ãƒ¢ãƒƒã‚¯ã€ä¾‹å¤–ã‚’æŠ•ã’ã‚‹
 	 */
 	@Test
 	public void test002() {
@@ -41,10 +41,12 @@ public class MockitoTest {
 		} catch(RuntimeException e) {
 			assertThat(e.getMessage(), is("aaa"));
 		}
+
+		assertNull(mockedList.get(1));
 	}
 
 	/**
-	 * ƒƒ\ƒbƒh	ŠO•”‚©‚ç’“ü‰Â”\	public	void	‘S•”	—áŠO‚ğ“Š‚°‚é
+	 * publicãƒ¡ã‚½ãƒƒãƒ‰ã€æˆ»ã‚Šå‹ã¯voidã€å…¨éƒ¨ãƒ¢ãƒƒã‚¯ã€ä¾‹å¤–ã‚’æŠ•ã’ã‚‹
 	 */
 	@Test
 	public void test003() {
@@ -58,36 +60,38 @@ public class MockitoTest {
 		} catch(RuntimeException e) {
 			assertThat(e.getMessage(), is("aaa"));
 		}
+
+		assertNull(mockedList.get(0));
 	}
 
 	/**
-	 * ƒƒ\ƒbƒh	ŠO•”‚©‚ç’“ü‰Â”\	public	voidˆÈŠO	ˆê•”	’l‚ğ–ß‚·
+	 * publicãƒ¡ã‚½ãƒƒãƒ‰ã€æˆ»ã‚Šå‹ã¯voidä»¥å¤–ã€ä¸€éƒ¨ãƒ¢ãƒƒã‚¯ã€å€¤ã‚’æˆ»ã™
 	 */
 	@Test
 	public void test004() {
 		List spiedList = spy(new ArrayList());
 
-		// ƒŠƒAƒ‹ƒIƒuƒWƒFƒNƒg‚É‚Í"bbb"‚ğ’Ç‰Á‚µ‚½‚ª
+		// ãƒªã‚¢ãƒ«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ã¯"bbb"ã‚’è¿½åŠ ã—ãŸãŒ
 		spiedList.add("bbb");
-		// ƒXƒpƒC‚Åget(0)‚Í"aaa"‚ğ•Ô‚·‚æ‚¤‚É‚µ‚½
+		// ã‚¹ãƒ‘ã‚¤ã§get(0)ã¯"aaa"ã‚’è¿”ã™ã‚ˆã†ã«ã—ãŸ
 		when(spiedList.get(0)).thenReturn("aaa");
 
-		// Œ‹‰Ê‚Í"aaa"‚ª“¾‚ç‚ê‚é
+		// çµæœã¯"aaa"ãŒå¾—ã‚‰ã‚Œã‚‹
 		assertThat((String)spiedList.get(0), is("aaa"));
-		// ‚»‚Ì‘¼‚Ìƒƒ\ƒbƒh‚ÍƒŠƒAƒ‹‚ÌŒ‹‰Ê‚ª•Ô‚³‚ê‚é
+		// ãã®ä»–ã®ãƒ¡ã‚½ãƒƒãƒ‰ã¯ãƒªã‚¢ãƒ«ã®çµæœãŒè¿”ã•ã‚Œã‚‹
 		assertThat(spiedList.size(), is(1));
 	}
 
 	/**
-	 * ƒƒ\ƒbƒh	ŠO•”‚©‚ç’“ü‰Â”\	public	voidˆÈŠO	ˆê•”	—áŠO‚ğ“Š‚°‚é
+	 * publicãƒ¡ã‚½ãƒƒãƒ‰ã€æˆ»ã‚Šå‹ã¯voidä»¥å¤–ã€ä¸€éƒ¨ãƒ¢ãƒƒã‚¯ã€ä¾‹å¤–ã‚’æŠ•ã’ã‚‹
 	 */
 	@Test
 	public void test005() {
 		List spiedList = spy(new ArrayList());
 
-		// ƒŠƒAƒ‹ƒIƒuƒWƒFƒNƒg‚É‚Í"bbb"‚ğ’Ç‰Á‚µ‚½‚ª
+		// ãƒªã‚¢ãƒ«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ã¯"bbb"ã‚’è¿½åŠ ã—ãŸãŒ
 		spiedList.add("bbb");
-		// ƒXƒpƒC‚Åget(0)‚ÍRuntimeException‚ğƒXƒ[‚·‚é‚æ‚¤‚É‚µ‚½
+		// ã‚¹ãƒ‘ã‚¤ã§get(0)ã¯RuntimeExceptionã‚’ã‚¹ãƒ­ãƒ¼ã™ã‚‹ã‚ˆã†ã«ã—ãŸ
 		when(spiedList.get(0)).thenThrow(new RuntimeException("aaa"));
 
 		try {
@@ -96,20 +100,20 @@ public class MockitoTest {
 		} catch(Exception e) {
 			assertThat(e.getMessage(), is("aaa"));
 		}
-		// ‚»‚Ì‘¼‚Ìƒƒ\ƒbƒh‚ÍƒŠƒAƒ‹‚ÌŒ‹‰Ê‚ª•Ô‚³‚ê‚é
+		// ãã®ä»–ã®ãƒ¡ã‚½ãƒƒãƒ‰ã¯ãƒªã‚¢ãƒ«ã®çµæœãŒè¿”ã•ã‚Œã‚‹
 		assertThat(spiedList.size(), is(1));
 	}
 
 	/**
-	 * ƒƒ\ƒbƒh	ŠO•”‚©‚ç’“ü‰Â”\	public	void	ˆê•”	—áŠO‚ğ“Š‚°‚é
+	 * publicãƒ¡ã‚½ãƒƒãƒ‰ã€æˆ»ã‚Šå‹ã¯voidã€ä¸€éƒ¨ãƒ¢ãƒƒã‚¯ã€ä¾‹å¤–ã‚’æŠ•ã’ã‚‹
 	 */
 	@Test
 	public void test006() {
 		List spiedList = spy(new ArrayList());
 
-		// ƒŠƒAƒ‹ƒIƒuƒWƒFƒNƒg‚É‚Í"bbb"‚ğ’Ç‰Á
+		// ãƒªã‚¢ãƒ«ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ã¯"bbb"ã‚’è¿½åŠ 
 		spiedList.add("bbb");
-		// clear‚ªŒÄ‚Î‚ê‚½‚Æ‚«‚ÍRuntimeException‚ğ“Š‚°‚é
+		// clearãŒå‘¼ã°ã‚ŒãŸã¨ãã¯RuntimeExceptionã‚’æŠ•ã’ã‚‹
 		doThrow(new RuntimeException("aaa")).when(spiedList).clear();
 
 		try {
@@ -119,8 +123,8 @@ public class MockitoTest {
 			assertThat(e.getMessage(), is("aaa"));
 		}
 
+		// ãã®ä»–ã®ãƒ¡ã‚½ãƒƒãƒ‰ã¯ãƒªã‚¢ãƒ«ã®çµæœãŒè¿”ã•ã‚Œã‚‹
 		assertThat(spiedList.size(), is(1));
 		assertThat((String)spiedList.get(0), is("bbb"));
 	}
-
 }
