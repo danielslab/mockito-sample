@@ -21,10 +21,12 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-// new Objectをモックするテスト
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ DateUtil.class })
-public class DateUtilTest {
+public class PowerMockTest {
+	/**
+	 * newで生成されるオブジェクト、publicメソッド、戻り型はvoid以外、全部モック、値を戻す
+	 */
 	@Test
 	public void test007() throws Exception {
 		// 期待値は2015/05/05
@@ -44,6 +46,9 @@ public class DateUtilTest {
 		assertThat(strDate, is("2015/05/05"));
 	}
 
+	/**
+	 * newで生成されるオブジェクト、publicメソッド、戻り型はvoid以外、全部モック、例外を投げる
+	 */
 	@Test
 	public void test008() throws Exception {
 		// 記録フェーズ
@@ -51,15 +56,18 @@ public class DateUtilTest {
 		whenNew(Date.class).withNoArguments().thenReturn(dateMocked);
 		when(dateMocked.getTime()).thenThrow(new RuntimeException("aaa"));
 
-		// リプレイフェーズ
+		// リプレイ＆検証フェーズ
 		try {
-			String strDate = DateUtil.getCurrentDate();
+			DateUtil.getCurrentDate();
 			fail();
 		} catch (RuntimeException e) {
 			assertThat(e.getMessage(), is("aaa"));
 		}
 	}
 
+	/**
+	 * newで生成されるオブジェクト、publicメソッド、戻り型はvoid、全部モック、例外を投げる
+	 */
 	@Test
 	public void test009() throws Exception {
 		// 記録フェーズ
@@ -67,7 +75,7 @@ public class DateUtilTest {
 		whenNew(Date.class).withNoArguments().thenReturn(dateMocked);
 		doThrow(new RuntimeException("bbb")).when(dateMocked).setTime(anyLong());
 
-		// リプレイフェーズ
+		// リプレイ＆検証フェーズ
 		try {
 			DateUtil.setCurrentDate(123456789L);
 			fail();
@@ -76,22 +84,32 @@ public class DateUtilTest {
 		}
 	}
 
+	/**
+	 * public staticメソッド、戻り型はvoid以外、全部モック、値を戻す
+	 */
 	@Test
 	public void test010() {
+		// 記録フェーズ
 		PowerMockito.mockStatic(String.class);
 		PowerMockito.when(String.valueOf(anyBoolean())).thenReturn("false");
 
+		// リプレイ＆検証フェーズ
 		assertThat(String.valueOf(true), is("false"));
 		assertThat(String.valueOf(false), is("false"));
 	}
 
+	/**
+	 * public staticメソッド、戻り型はvoid以外、全部モック、例外を投げる
+	 */
 	@Test
 	public void test011() {
+		// 記録フェーズ
 		PowerMockito.mockStatic(String.class);
 		PowerMockito.when(String.valueOf(true)).thenThrow(new RuntimeException("aaa"));
 
+		// リプレイ＆検証フェーズ
 		try {
-			assertThat(String.valueOf(true), is("false"));
+			String.valueOf(true);
 			fail();
 		} catch (RuntimeException e) {
 			assertThat(e.getMessage(), is("aaa"));
@@ -99,8 +117,12 @@ public class DateUtilTest {
 		assertNull(String.valueOf(false));
 	}
 
+	/**
+	 * public staticメソッド、戻り型はvoid、全部モック、例外を投げる
+	 */
 	@Test
 	public void test012() {
+		// 記録フェーズ
 		PowerMockito.mockStatic(DateUtil.class);
 		try {
 			doThrow(new RuntimeException("bbb")).when(DateUtil.class, "setCurrentDate", anyLong());
@@ -108,6 +130,7 @@ public class DateUtilTest {
 			fail();
 		}
 
+		// リプレイ＆検証フェーズ
 		try {
 			DateUtil.setCurrentDate(12345L);
 			fail();
@@ -116,6 +139,9 @@ public class DateUtilTest {
 		}
 	}
 
+	/**
+	 * privateメソッド、戻り型はvoid以外、全部モック、値を戻す
+	 */
 	@Test
 	public void test013() throws Exception {
 		// 記録フェーズ
@@ -131,13 +157,16 @@ public class DateUtilTest {
 		assertThat(actual, is("12345678"));
 	}
 
+	/**
+	 * privateメソッド、戻り型はvoid以外、全部モック、例外を投げる
+	 */
 	@Test
 	public void test014() throws Exception {
 		// 記録フェーズ
 		DateUtil dateMocked = PowerMockito.mock(DateUtil.class);
 		PowerMockito.when(dateMocked, "getYYYYMMDDString", (Date) any()).thenThrow(new Exception("aaa"));
 
-		// リプレイフェーズ
+		// リプレイ＆検証フェーズ
 		try {
 			Method getYYYYMMDDStringMethod = DateUtil.class.getDeclaredMethod("getYYYYMMDDString", Date.class);
 			getYYYYMMDDStringMethod.setAccessible(true);
@@ -153,13 +182,16 @@ public class DateUtilTest {
 		}
 	}
 
+	/**
+	 * privateメソッド、戻り型はvoid、全部モック、例外を投げる
+	 */
 	@Test
 	public void test015() throws Exception {
 		// 記録フェーズ
 		DateUtil dateMocked = PowerMockito.mock(DateUtil.class);
 		PowerMockito.doThrow(new Exception("bbb")).when(dateMocked, "setFlag", anyBoolean());
 
-		// リプレイフェーズ
+		// リプレイ＆検証フェーズ
 		Method setFlagMethod = DateUtil.class.getDeclaredMethod("setFlag", Boolean.class);
 		setFlagMethod.setAccessible(true);
 		try {
@@ -175,6 +207,9 @@ public class DateUtilTest {
 		}
 	}
 
+	/**
+	 * privateメソッド、戻り型はvoid以外、一部モック、値を戻す
+	 */
 	@Test
 	public void test016() throws Exception {
 		// 記録フェーズ
@@ -188,27 +223,34 @@ public class DateUtilTest {
 		assertThat(strDate, is("12345678"));
 	}
 
+	/**
+	 * privateメソッド、戻り型はvoid以外、一部モック、例外を投げる
+	 */
 	@Test
 	public void test017() throws Exception {
 		// 記録フェーズ
 		DateUtil dateMocked = PowerMockito.spy(new DateUtil());
 		PowerMockito.doThrow(new RuntimeException("aaa")).when(dateMocked, "getYYYYMMDDString", (Date) any());
 
-		// リプレイフェーズ
+		// リプレイ＆検証フェーズ
 		try {
-			String strDate = dateMocked.getYYYYMMDDStringWrapper(new Date());
+			dateMocked.getYYYYMMDDStringWrapper(new Date());
+			fail();
 		} catch (RuntimeException e) {
 			assertThat(e.getMessage(), is("aaa"));
 		}
 	}
 
+	/**
+	 * privateメソッド、戻り型はvoid、一部モック、例外を投げる
+	 */
 	@Test
 	public void test018() throws Exception {
 		// 記録フェーズ
 		DateUtil dateMocked = PowerMockito.spy(new DateUtil());
 		PowerMockito.doThrow(new Exception("bbb")).when(dateMocked, "setFlag", anyBoolean());
 
-		// リプレイフェーズ
+		// リプレイ＆検証フェーズ
 		Method setFlagMethod = DateUtil.class.getDeclaredMethod("setFlag", Boolean.class);
 		setFlagMethod.setAccessible(true);
 		try {
